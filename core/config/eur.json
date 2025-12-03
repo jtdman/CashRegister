@@ -1,0 +1,21 @@
+{
+  "code": "EUR",
+  "name": "Euro",
+  "max_value": 101,
+  "denominations": [
+    { "name": "100€", "plural": "100€", "value": 10000 },
+    { "name": "50€", "plural": "50€", "value": 5000 },
+    { "name": "20€", "plural": "20€", "value": 2000 },
+    { "name": "10€", "plural": "10€", "value": 1000 },
+    { "name": "5€", "plural": "5€", "value": 500 },
+    { "name": "2€", "plural": "2€", "value": 200 },
+    { "name": "1€", "plural": "1€", "value": 100 },
+    { "name": "50c", "plural": "50c", "value": 50 },
+    { "name": "20c", "plural": "20c", "value": 20 },
+    { "name": "10c", "plural": "10c", "value": 10 },
+    { "name": "5c", "plural": "5c", "value": 5 },
+    { "name": "2c", "plural": "2c", "value": 2 },
+    { "name": "1c", "plural": "1c", "value": 1 }
+  ],
+  "payment_denominations": [100, 200, 500, 1000, 2000, 5000, 10000]
+}

@@ -1,0 +1,21 @@
+{
+  "code": "USD",
+  "name": "US Dollar",
+  "max_value": 101,
+  "use_pennies": true,
+  "use_half_dollars": false,
+  "denominations": [
+    { "name": "hundred", "plural": "hundreds", "value": 10000 },
+    { "name": "fifty", "plural": "fifties", "value": 5000 },
+    { "name": "twenty", "plural": "twenties", "value": 2000 },
+    { "name": "ten", "plural": "tens", "value": 1000 },
+    { "name": "five", "plural": "fives", "value": 500 },
+    { "name": "dollar", "plural": "dollars", "value": 100 },
+    { "name": "half dollar", "plural": "half dollars", "value": 50, "flag": "use_half_dollars" },
+    { "name": "quarter", "plural": "quarters", "value": 25 },
+    { "name": "dime", "plural": "dimes", "value": 10 },
+    { "name": "nickel", "plural": "nickels", "value": 5 },
+    { "name": "penny", "plural": "pennies", "value": 1, "flag": "use_pennies" }
+  ],
+  "payment_denominations": [100, 500, 1000, 2000, 5000, 10000]
+}

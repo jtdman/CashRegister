@@ -1,0 +1,14 @@
+{
+  "name": "cash-register-tools",
+  "version": "1.0.0",
+  "description": "Tools for generating cash register input files",
+  "type": "module",
+  "bin": {
+    "generate": "./generate.js"
+  },
+  "scripts": {
+    "generate:usd": "node generate.js USD",
+    "generate:eur": "node generate.js EUR"
+  },
+  "license": "MIT"
+}

@@ -1,0 +1,16 @@
+# Sample data files
+data/*.txt
+!data/.gitkeep
+
+# Output files
+output/**/*.txt
+!output/.gitkeep
+
+# Node modules
+node_modules/
+
+# OS files
+.DS_Store
+*.swp
+*.swo
+*~

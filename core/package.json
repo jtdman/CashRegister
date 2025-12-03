@@ -1,0 +1,20 @@
+{
+  "name": "cash-register-core",
+  "version": "1.0.0",
+  "description": "Core change calculation engine for cash register",
+  "main": "index.js",
+  "type": "module",
+  "exports": {
+    ".": "./index.js",
+    "./config/*": "./config/*"
+  },
+  "scripts": {
+    "test": "node --test"
+  },
+  "keywords": [
+    "cash-register",
+    "change",
+    "currency"
+  ],
+  "license": "MIT"
+}
