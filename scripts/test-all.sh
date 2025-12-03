@@ -126,7 +126,15 @@ if [ -n "$PYTHON_CMD" ]; then
             print_error "Python client failed"
         fi
     else
-        print_error "Python 'requests' module not installed. Run: pip install requests"
+        print_error "Python 'requests' module not installed."
+        # Try to find pip
+        if command -v pip3 &> /dev/null; then
+            print_info "Install with: pip3 install requests"
+        elif command -v pip &> /dev/null; then
+            print_info "Install with: pip install requests"
+        else
+            print_info "Install with: $PYTHON_CMD -m pip install requests"
+        fi
     fi
 fi
 
