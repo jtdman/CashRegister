@@ -10,7 +10,7 @@ const __dirname = dirname(__filename);
  * @returns {object} Default configuration
  */
 export function loadDefaultConfig() {
-  const configPath = join(__dirname, 'config', 'default.json');
+  const configPath = join(__dirname, '..', 'config', 'default.json');
   return JSON.parse(readFileSync(configPath, 'utf-8'));
 }
 
@@ -21,7 +21,7 @@ export function loadDefaultConfig() {
  */
 export function loadCurrencyConfig(code) {
   const defaults = loadDefaultConfig();
-  const configPath = join(__dirname, 'config', `${code.toLowerCase()}.json`);
+  const configPath = join(__dirname, '..', 'config', `${code.toLowerCase()}.json`);
   const currencyConfig = JSON.parse(readFileSync(configPath, 'utf-8'));
 
   // Merge defaults with currency config (currency config takes precedence)
@@ -272,11 +272,13 @@ export function parseInputFile(content) {
  * Process an entire input file
  * @param {string} content - File content
  * @param {object} options - Override options
- * @returns {object} { currency: string, results: string[], hasRandom: boolean }
+ * @returns {object} { currency: string, results: string[], hasRandom: boolean, divisor: number }
  */
 export function processFile(content, options = {}) {
   const { currency, lines } = parseInputFile(content);
   const currencyConfig = loadCurrencyConfig(currency);
+  const config = { ...currencyConfig, ...options };
+  const divisor = config.random_divisor || 3;
 
   const processed = lines.map(line => processTransaction(line, currencyConfig, options));
   const hasRandom = processed.some(p => p.useRandom);
@@ -284,6 +286,7 @@ export function processFile(content, options = {}) {
   return {
     currency,
     results: processed.map(p => p.line),
-    hasRandom
+    hasRandom,
+    divisor
   };
 }

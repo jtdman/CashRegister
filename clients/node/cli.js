@@ -102,7 +102,9 @@ function main() {
   // Write output
   const lines = [];
   if (result.hasRandom) {
-    lines.push('* randomization used');
+    lines.push(`* randomization used - divisible by ${result.divisor}`);
+  } else {
+    lines.push(`* no entries divisible by ${result.divisor}`);
   }
   lines.push(...result.results);
 

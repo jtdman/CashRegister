@@ -6,20 +6,25 @@ This project calculates change for cash register transactions with configurable 
 
 ```
 CashRegister/
+├── config/                  # Shared currency configurations
+│   ├── default.json         # Global defaults
+│   ├── usd.json             # US Dollar settings
+│   └── eur.json             # Euro settings
 ├── core/                    # Core calculation engine (Node.js)
-│   ├── config/              # Currency configurations
-│   │   ├── default.json     # Global defaults
-│   │   ├── usd.json         # US Dollar settings
-│   │   └── eur.json         # Euro settings
 │   └── index.js             # Main logic
+├── api/                     # REST API server
+│   ├── server.js            # Express server
+│   └── package.json         # API dependencies
 ├── clients/                 # Client implementations
-│   └── node/                # Node.js CLI client
+│   ├── node/                # Node.js CLI client
+│   └── bash/                # Bash CLI client (uses API)
 ├── tools/                   # Utilities
 │   └── generate.js          # Input file generator
 ├── data/                    # Input files (gitignored)
 └── output/                  # Output files (gitignored)
     └── clients/
-        └── node/
+        ├── node/
+        └── bash/
 ```
 
 ## Quick Start
@@ -106,6 +111,55 @@ For example:
 - `--no-pennies` - Use Swedish rounding (USD only)
 - `--half-dollars` - Enable half dollar coins (USD only)
 
+### 3. Run the API Server
+
+For multi-language client support, use the REST API.
+
+```bash
+cd api
+npm install
+npm start
+```
+
+The API runs on http://localhost:3000. See [api/README.md](api/README.md) for full endpoint documentation.
+
+**Quick examples:**
+
+```bash
+# Health check
+curl http://localhost:3000/health
+
+# Calculate single transaction
+curl -X POST http://localhost:3000/calculate \
+  -H "Content-Type: application/json" \
+  -d '{"currency":"USD","owed":"12.34","paid":"20.00"}'
+
+# Batch process transactions
+curl -X POST http://localhost:3000/batch \
+  -H "Content-Type: application/json" \
+  -d '{"currency":"USD","transactions":["12.34,20.00","5.67,10.00"]}'
+```
+
+### 4. Run the Bash Client
+
+The bash client uses the API server. Make sure the API is running first.
+
+**From the clients/bash directory:**
+
+```bash
+cd clients/bash
+
+# Process a USD input file
+./cash-register.sh ../../data/sample-usd.txt
+
+# With options
+./cash-register.sh ../../data/sample-usd.txt --divisor 5 --no-pennies
+```
+
+Output will be written to `output/clients/bash/<input-filename>-output.txt`.
+
+See [clients/bash/README.md](clients/bash/README.md) for full documentation.
+
 ## Input File Format
 
 Input files must include a currency header followed by transaction lines:
@@ -124,18 +178,25 @@ CURRENCY:USD
 Output files show the change calculation for each transaction:
 
 ```
-* randomization used
+* randomization used - divisible by 3
 *96.87, 100.00, 3.13: 2 dollars, 1 dime, 15 nickels, 28 pennies
 98.39, 100.00, 1.61: 1 dollar, 2 quarters, 1 dime, 1 penny
 ```
 
-- **First line**: `* randomization used` (if any transactions used random mode)
+Or when no entries match the divisor:
+
+```
+* no entries divisible by 5
+12.34, 20.00, 7.66: 1 five, 2 dollars, 2 quarters, 1 dime, 1 nickel, 1 penny
+```
+
+- **First line**: Shows divisor and whether randomization was used
 - **Asterisk prefix**: `*` marks lines that used random denomination selection
 - **Format**: `<owed>, <paid>, <change>: <denominations>`
 
 ## Configuration Options
 
-### Global Configuration (`core/config/default.json`)
+### Global Configuration (`config/default.json`)
 
 ```json
 {
@@ -147,7 +208,7 @@ Output files show the change calculation for each transaction:
 
 ### Currency Configuration
 
-Each currency has its own config file (e.g., `core/config/usd.json`):
+Each currency has its own config file (e.g., `config/usd.json`):
 
 ```json
 {
@@ -200,7 +261,7 @@ node cli.js <input-file> [options]
 | --------------------- | ---------------------------------------------------------------- | ---------------- |
 | `--no-pennies`        | Disable pennies, use Swedish rounding                            | `--no-pennies`   |
 | `--half-dollars`      | Enable half dollar coins                                         | `--half-dollars` |
-| `--divisor <n>`       | Override random divisor (default: 3 from `core/config/default.json`) | `--divisor 5`    |
+| `--divisor <n>`       | Override random divisor (default: 3 from `config/default.json`) | `--divisor 5`    |
 | `-o, --output <path>` | Custom output file path                                          | `-o results.txt` |
 | `-h, --help`          | Show help message                                                | `--help`         |
 
@@ -224,6 +285,19 @@ node cli.js ../../data/sample-usd.txt --no-pennies --divisor 7
 # Custom output file
 node cli.js ../../data/sample-usd.txt -o my-results.txt
 ```
+
+## API Endpoints
+
+The REST API provides HTTP access to the core calculation logic. See [api/README.md](api/README.md) for complete documentation.
+
+| Endpoint              | Method | Description                           |
+| --------------------- | ------ | ------------------------------------- |
+| `/health`             | GET    | Health check                          |
+| `/currencies`         | GET    | List available currencies             |
+| `/currencies/:code`   | GET    | Get currency configuration            |
+| `/calculate`          | POST   | Calculate change for single transaction |
+| `/batch`              | POST   | Process multiple transactions         |
+| `/process`            | POST   | Process raw input file content        |
 
 ## Special Features
 
@@ -249,12 +323,12 @@ When `use_pennies: false` or `--no-pennies` flag is used, change is rounded to t
 
 ## Adding New Currencies
 
-1. Create a new config file: `core/config/<code>.json`
+1. Create a new config file: `config/<code>.json`
 2. Define denominations and settings
 3. Add to generator's payment denominations
 4. Generate input file: `node tools/generate.js <CODE>`
 
-Example for Japanese Yen (`core/config/jpy.json`):
+Example for Japanese Yen (`config/jpy.json`):
 
 ```json
 {
@@ -276,25 +350,69 @@ Example for Japanese Yen (`core/config/jpy.json`):
 }
 ```
 
+## Multi-Language Client Support
+
+The API server enables clients written in any language to use the core calculation logic:
+
+### Python Example
+
+```python
+import requests
+
+response = requests.post('http://localhost:3000/calculate', json={
+    'currency': 'USD',
+    'owed': '12.34',
+    'paid': '20.00'
+})
+result = response.json()
+print(f"Change: {result['change']} - {result['breakdown']}")
+```
+
+### .NET Example
+
+```csharp
+using var client = new HttpClient();
+var response = await client.PostAsJsonAsync("http://localhost:3000/calculate", new {
+    currency = "USD",
+    owed = "12.34",
+    paid = "20.00"
+});
+var result = await response.Content.ReadFromJsonAsync<CalculateResult>();
+```
+
+### Bash/curl Example
+
+```bash
+curl -X POST http://localhost:3000/calculate \
+  -H "Content-Type: application/json" \
+  -d '{"currency":"USD","owed":"12.34","paid":"20.00"}'
+```
+
 ## Development
 
 ### Project Requirements
 
 - Node.js (ES modules support)
 - No external dependencies for core logic
+- Express + cors for API server
 
 ### Running Tests
 
 ```bash
 # Generate test data
-cd tools
-node generate.js USD -n 20
+node tools/generate.js USD -n 20
 
-# Process with different settings
-cd ../clients/node
-node cli.js ../../data/sample-usd.txt
-node cli.js ../../data/sample-usd.txt --divisor 5
-node cli.js ../../data/sample-usd.txt --no-pennies
+# Process with Node client
+node clients/node/cli.js data/sample-usd.txt
+node clients/node/cli.js data/sample-usd.txt --divisor 5
+node clients/node/cli.js data/sample-usd.txt --no-pennies
+
+# Test API
+cd api && npm start &
+curl http://localhost:3000/health
+curl -X POST http://localhost:3000/calculate \
+  -H "Content-Type: application/json" \
+  -d '{"currency":"USD","owed":"12.34","paid":"20.00"}'
 ```
 
 ## Troubleshooting
@@ -313,13 +431,26 @@ node cli.js ../../data/sample-usd.txt
 Generate sample data first:
 
 ```bash
-cd tools
-node generate.js USD
-node generate.js EUR
+node tools/generate.js USD
+node tools/generate.js EUR
 ```
 
 ### Issue: Unexpected change calculations
 
 - Verify the currency header in input file: `CURRENCY:USD`
-- Check denomination configs in `core/config/`
+- Check denomination configs in `config/`
 - Test with `--divisor 0` to disable random mode
+
+### Issue: API not starting
+
+```bash
+cd api
+npm install
+npm start
+```
+
+Make sure port 3000 is available, or set a custom port:
+
+```bash
+PORT=8080 npm start
+```

@@ -14,7 +14,7 @@ const rootDir = join(__dirname, '..');
  * @returns {object} Currency config
  */
 function loadCurrencyConfig(code) {
-  const configPath = join(rootDir, 'core', 'config', `${code.toLowerCase()}.json`);
+  const configPath = join(rootDir, 'config', `${code.toLowerCase()}.json`);
   return JSON.parse(readFileSync(configPath, 'utf-8'));
 }
 
