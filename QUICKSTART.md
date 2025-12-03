@@ -53,8 +53,8 @@ node clients/node/cli.js data/sample-usd.txt
 ### Python Client
 
 ```bash
-pip install requests  # if not already installed
-python clients/python/cash_register.py data/sample-usd.txt
+pip3 install requests  # if not already installed
+python3 clients/python/cash_register.py data/sample-usd.txt
 ```
 
 ### .NET Client
