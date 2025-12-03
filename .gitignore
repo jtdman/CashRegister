@@ -9,6 +9,10 @@ output/**/*.txt
 # Node modules
 node_modules/
 
+# .NET build artifacts
+**/bin/
+**/obj/
+
 # OS files
 .DS_Store
 *.swp
