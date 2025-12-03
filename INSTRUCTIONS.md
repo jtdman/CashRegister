@@ -17,14 +17,18 @@ CashRegister/
 │   └── package.json         # API dependencies
 ├── clients/                 # Client implementations
 │   ├── node/                # Node.js CLI client
-│   └── bash/                # Bash CLI client (uses API)
+│   ├── bash/                # Bash CLI client (uses API)
+│   ├── python/              # Python CLI client (uses API)
+│   └── dotnet/              # .NET CLI client (uses API)
 ├── tools/                   # Utilities
 │   └── generate.js          # Input file generator
 ├── data/                    # Input files (gitignored)
 └── output/                  # Output files (gitignored)
     └── clients/
         ├── node/
-        └── bash/
+        ├── bash/
+        ├── python/
+        └── dotnet/
 ```
 
 ## Quick Start
@@ -159,6 +163,53 @@ cd clients/bash
 Output will be written to `output/clients/bash/<input-filename>-output.txt`.
 
 See [clients/bash/README.md](clients/bash/README.md) for full documentation.
+
+### 5. Run the Python Client
+
+The Python client uses the API server. Make sure the API is running first.
+
+**Prerequisites:** `pip install requests`
+
+**From the clients/python directory:**
+
+```bash
+cd clients/python
+
+# Process a USD input file
+python cash_register.py ../../data/sample-usd.txt
+
+# With options
+python cash_register.py ../../data/sample-usd.txt --divisor 5 --no-pennies
+```
+
+Output will be written to `output/clients/python/<input-filename>-output.txt`.
+
+See [clients/python/README.md](clients/python/README.md) for full documentation.
+
+### 6. Run the .NET Client
+
+The .NET client uses the API server. Make sure the API is running first.
+
+**Prerequisites:** .NET 8.0 SDK
+
+**From the clients/dotnet directory:**
+
+```bash
+cd clients/dotnet
+
+# Build the project
+dotnet build
+
+# Process a USD input file
+dotnet run -- ../../data/sample-usd.txt
+
+# With options
+dotnet run -- ../../data/sample-usd.txt --divisor 5 --no-pennies
+```
+
+Output will be written to `output/clients/dotnet/<input-filename>-output.txt`.
+
+See [clients/dotnet/README.md](clients/dotnet/README.md) for full documentation.
 
 ## Input File Format
 
